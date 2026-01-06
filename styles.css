@@ -1,0 +1,46 @@
+:root{
+  --navy:#0b2545;
+  --teal:#0ea5a4;
+  --muted:#6b7280;
+  --bg:#f7fbfd;
+  --card:#ffffff;
+  --danger:#d9534f;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{font-family:Inter,Segoe UI,system-ui,Arial;color:var(--navy);background:linear-gradient(180deg,var(--bg),#eef7f8);margin:0}
+.container{max-width:960px;margin:24px auto;padding:0 16px}
+.site-header{background:linear-gradient(90deg,var(--navy),#082033);color:#fff;padding:28px 0}
+.site-header h1{margin:0;font-size:28px}
+.site-header .lead{margin:6px 0 0;color:rgba(255,255,255,0.85)}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:0 6px 18px rgba(11,37,69,0.08);padding:18px;margin-top:18px}
+.form-card{padding:20px}
+h2{margin:0 0 12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column}
+.form-group.full{grid-column:1/-1}
+label{font-size:13px;color:var(--muted);margin-bottom:6px}
+input,select{padding:10px 12px;border:1px solid #e6eef0;border-radius:8px;font-size:15px}
+input:focus,select:focus{outline:none;box-shadow:0 0 0 3px rgba(14,165,164,0.12);border-color:var(--teal)}
+.form-actions{display:flex;align-items:center;gap:12px;margin-top:12px}
+.btn{background:transparent;border:1px solid rgba(11,37,69,0.08);padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{filter:brightness(0.98)}
+.btn-primary{background:var(--teal);color:#fff;border:none}
+.btn-danger{background:var(--danger);color:#fff;border:none}
+#message{margin-left:12px;color:var(--muted);font-size:14px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #f1f5f6}
+th{font-size:13px;color:var(--muted)}
+.actions button{margin-right:8px}
+.empty{color:var(--muted);padding:12px}
+
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(3,6,23,0.45);opacity:0;pointer-events:none;transition:opacity 0.18s}
+.modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
+.modal-content{background:var(--card);padding:18px;border-radius:12px;min-width:300px;max-width:90%}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+
+@media (max-width:640px){
+  .grid{grid-template-columns:1fr}
+  .form-actions{flex-direction:column;align-items:flex-start}
+}

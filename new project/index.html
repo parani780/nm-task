@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Automated Deployment — High Traffic</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <h1>Automated Deployment During High Traffic</h1>
+      <p class="subtitle">Simulate traffic, preview commands, and trigger a safe deploy workflow.</p>
+    </div>
+  </header>
+
+  <main class="container grid">
+    <section class="card">
+      <h2>Traffic Simulation</h2>
+      <label>Concurrent users: <input id="users" type="number" min="1" value="2000" /></label>
+      <div class="actions">
+        <button id="simulate" class="btn primary">Simulate Traffic</button>
+        <button id="deploy" class="btn accent">Deploy Now</button>
+      </div>
+      <div id="simResult" class="panel small muted">No simulation yet.</div>
+    </section>
+
+    <section class="card">
+      <h2>Deployment Preview</h2>
+      <div id="commands" class="panel monospace">Click "Deploy Now" to see commands.</div>
+    </section>
+
+    <section class="card wide">
+      <h2>Live Log</h2>
+      <div id="log" class="log" aria-live="polite">Ready.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">Professional color theme • Sample Jenkins & Docker pipeline included</div>
+  </footer>
+
+  <!-- Floating info button & panel -->
+  <div class="floating">
+    <button id="infoToggle" class="floating-btn" aria-label="Project info">i</button>
+  </div>
+
+  <aside id="infoPanel" class="info-panel" aria-hidden="true">
+    <header class="info-header">
+      <strong>Project Info</strong>
+      <button id="infoClose" class="close">✕</button>
+    </header>
+    <nav class="info-tabs" role="tablist">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="contents">Contents</button>
+      <button class="tab" data-tab="commands">Commands</button>
+      <button class="tab" data-tab="arch">Architecture</button>
+      <button class="tab" data-tab="best">Best Practices</button>
+    </nav>
+    <div id="infoContent" class="info-content">Loading...</div>
+    <footer class="info-footer">Theme: Professional navy & teal • Ready for CI integration</footer>
+  </aside>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

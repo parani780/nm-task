@@ -1,93 +1,66 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Registration Form</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container">
-        <h1>Registration form</h1>
-      </div>
-    </header>
-
-    <main class="container">
-      <section class="card form-card">
-        <h2 id="form-title">New Registration</h2>
-        <form id="reg-form" novalidate>
-          <div class="grid">
-            <div class="form-group">
-              <label for="firstName">First name</label>
-              <input id="firstName" name="firstName" type="text" required />
-            </div>
-            <div class="form-group">
-              <label for="lastName">Last name</label>
-              <input id="lastName" name="lastName" type="text" required />
-            </div>
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" required />
-            </div>
-            <div class="form-group">
-              <label for="phone">Phone</label>
-              <input id="phone" name="phone" type="tel" pattern="[0-9\-\s()+]{7,20}" />
-            </div>
-            <div class="form-group full">
-              <label for="profession">Profession</label>
-              <select id="profession" name="profession" required>
-                <option value="">Select</option>
-                <option>Developer</option>
-                <option>Designer</option>
-                <option>Product Manager</option>
-                <option>Data Scientist</option>
-                <option>Other</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="submit-btn">Save</button>
-            <button type="button" class="btn" id="reset-btn">Reset</button>
-            <div id="message" role="status" aria-live="polite"></div>
-          </div>
-        </form>
-      </section>
-
-      <section class="card list-card">
-        <h2>Registrations</h2>
-        <div class="table-wrap">
-          <table id="reg-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Profession</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- rows injected by JS -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </main>
-
-    <!-- Delete confirmation modal -->
-    <div id="confirm-modal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="confirm-title">
-      <div class="modal-content">
-        <h3 id="confirm-title">Confirm delete</h3>
-        <p id="confirm-text">Are you sure you want to delete this registration?</p>
-        <div class="modal-actions">
-          <button id="confirm-cancel" class="btn">Cancel</button>
-          <button id="confirm-ok" class="btn btn-danger">Delete</button>
-        </div>
-      </div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Automated Deployment — High Traffic</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="container">
+      <h1>Automated Deployment During High Traffic</h1>
+      <p class="subtitle">Simulate traffic, preview commands, and trigger a safe deploy workflow.</p>
     </div>
+  </header>
 
-    <script src="app.js" defer></script>
-  </body>
+  <main class="container grid">
+    <section class="card">
+      <h2>Traffic Simulation</h2>
+      <label>Concurrent users: <input id="users" type="number" min="1" value="2000" /></label>
+      <div class="actions">
+        <button id="simulate" class="btn primary">Simulate Traffic</button>
+        <button id="deploy" class="btn accent">Deploy Now</button>
+      </div>
+      <div id="simResult" class="panel small muted">No simulation yet.</div>
+    </section>
+
+    <section class="card">
+      <h2>Deployment Preview</h2>
+      <div id="commands" class="panel monospace">Click "Deploy Now" to see commands.</div>
+    </section>
+
+    <section class="card wide">
+      <h2>Live Log</h2>
+      <div id="log" class="log" aria-live="polite">Ready.</div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">Professional color theme • Sample Jenkins & Docker pipeline included</div>
+  </footer>
+
+  <!-- Floating info button & panel -->
+  <div class="floating">
+    <button id="infoToggle" class="floating-btn" aria-label="Project info">i</button>
+  </div>
+
+  <aside id="infoPanel" class="info-panel" aria-hidden="true">
+    <header class="info-header">
+      <strong>Project Info</strong>
+      <button id="infoClose" class="close">✕</button>
+    </header>
+    <nav class="info-tabs" role="tablist">
+      <button class="tab active" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="contents">Contents</button>
+      <button class="tab" data-tab="commands">Commands</button>
+      <button class="tab" data-tab="arch">Architecture</button>
+      <button class="tab" data-tab="best">Best Practices</button>
+    </nav>
+    <div id="infoContent" class="info-content">Loading...</div>
+    <footer class="info-footer">Theme: Professional navy & teal • Ready for CI integration</footer>
+  </aside>
+
+  <script src="app.js" defer></script>
+</body>
 </html>

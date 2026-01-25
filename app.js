@@ -1,140 +1,124 @@
-// Simple DOM CRUD using localStorage
-(function(){
-  const STORAGE_KEY = 'registrations_v1';
-  const form = document.getElementById('reg-form');
-  const tableBody = document.querySelector('#reg-table tbody');
-  const msgEl = document.getElementById('message');
-  const resetBtn = document.getElementById('reset-btn');
-  const submitBtn = document.getElementById('submit-btn');
-  const formTitle = document.getElementById('form-title');
+document.addEventListener('DOMContentLoaded', ()=>{
+  const simulateBtn = document.getElementById('simulate');
+  const deployBtn = document.getElementById('deploy');
+  const usersInput = document.getElementById('users');
+  const simResult = document.getElementById('simResult');
+  const commandsEl = document.getElementById('commands');
+  const logEl = document.getElementById('log');
 
-  // modal elements
-  const modal = document.getElementById('confirm-modal');
-  const confirmText = document.getElementById('confirm-text');
-  const confirmOk = document.getElementById('confirm-ok');
-  const confirmCancel = document.getElementById('confirm-cancel');
+  function log(line){
+    const t = new Date().toLocaleTimeString();
+    logEl.textContent += `[${t}] ${line}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+  }
 
-  let entries = [];
-  let editingId = null;
-  let pendingDeleteId = null;
-
-  function load(){
+  simulateBtn.addEventListener('click', async ()=>{
+    const users = Number(usersInput.value) || 100;
+    simResult.textContent = 'Running simulation...';
+    log(`Starting traffic simulation for ${users} users`);
     try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      entries = raw ? JSON.parse(raw) : [];
-    }catch(e){ entries = [] }
-  }
-
-  function save(){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }
-
-  function showMessage(text, timeout=2500){
-    msgEl.textContent = text;
-    setTimeout(()=>{ if(msgEl.textContent === text) msgEl.textContent = '' }, timeout);
-  }
-
-  function clearForm(){
-    form.reset();
-    editingId = null;
-    submitBtn.textContent = 'Save';
-    formTitle.textContent = 'New Registration';
-  }
-
-  function render(){
-    tableBody.innerHTML = '';
-    if(entries.length === 0){
-      const tr = document.createElement('tr');
-      const td = document.createElement('td');
-      td.colSpan = 5; td.className = 'empty'; td.textContent = 'No registrations yet.';
-      tr.appendChild(td); tableBody.appendChild(tr); return;
-    }
-
-    entries.forEach(e => {
-      const tr = document.createElement('tr');
-      const nameTd = document.createElement('td');
-      nameTd.textContent = e.firstName + ' ' + e.lastName;
-      const emailTd = document.createElement('td'); emailTd.textContent = e.email;
-      const phoneTd = document.createElement('td'); phoneTd.textContent = e.phone || '-';
-      const profTd = document.createElement('td'); profTd.textContent = e.profession || '-';
-      const actionsTd = document.createElement('td');
-      actionsTd.className = 'actions';
-
-      const editBtn = document.createElement('button');
-      editBtn.className = 'btn'; editBtn.textContent = 'Edit';
-      editBtn.addEventListener('click', ()=> startEdit(e.id));
-
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn btn-danger'; delBtn.textContent = 'Delete';
-      delBtn.addEventListener('click', ()=> requestDelete(e.id, e.firstName + ' ' + e.lastName));
-
-      actionsTd.appendChild(editBtn); actionsTd.appendChild(delBtn);
-
-      tr.appendChild(nameTd); tr.appendChild(emailTd); tr.appendChild(phoneTd); tr.appendChild(profTd); tr.appendChild(actionsTd);
-      tableBody.appendChild(tr);
-    });
-  }
-
-  function validateForm(data){
-    if(!data.firstName.trim() || !data.lastName.trim()) return 'First and last name are required.';
-    if(!data.email.trim() || !/^\S+@\S+\.\S+$/.test(data.email)) return 'Valid email is required.';
-    if(!data.profession) return 'Please select a profession.';
-    return '';
-  }
-
-  function startEdit(id){
-    const entry = entries.find(x=>x.id===id); if(!entry) return;
-    document.getElementById('firstName').value = entry.firstName;
-    document.getElementById('lastName').value = entry.lastName;
-    document.getElementById('email').value = entry.email;
-    document.getElementById('phone').value = entry.phone || '';
-    document.getElementById('profession').value = entry.profession || '';
-    editingId = id; submitBtn.textContent = 'Update'; formTitle.textContent = 'Edit Registration';
-    window.scrollTo({top:0,behavior:'smooth'});
-  }
-
-  function requestDelete(id, name){
-    pendingDeleteId = id;
-    confirmText.textContent = `Delete "${name}"? This cannot be undone.`;
-    modal.setAttribute('aria-hidden','false');
-  }
-
-  function confirmDelete(){
-    if(pendingDeleteId == null) return closeModal();
-    entries = entries.filter(e=>e.id !== pendingDeleteId);
-    save(); render(); showMessage('Deleted successfully.');
-    pendingDeleteId = null; closeModal();
-  }
-
-  function closeModal(){ modal.setAttribute('aria-hidden','true'); }
-
-  form.addEventListener('submit', (ev)=>{
-    ev.preventDefault();
-    const data = {
-      firstName: document.getElementById('firstName').value,
-      lastName: document.getElementById('lastName').value,
-      email: document.getElementById('email').value,
-      phone: document.getElementById('phone').value,
-      profession: document.getElementById('profession').value
-    };
-
-    const err = validateForm(data);
-    if(err){ showMessage(err); return }
-
-    if(editingId){
-      const idx = entries.findIndex(x=>x.id===editingId);
-      if(idx>-1){ entries[idx] = Object.assign({}, entries[idx], data); save(); render(); showMessage('Updated successfully.'); clearForm(); }
-    }else{
-      const newEntry = Object.assign({id: Date.now().toString()}, data);
-      entries.push(newEntry); save(); render(); showMessage('Saved successfully.'); clearForm();
+      const res = await fetch('/simulate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({users})});
+      const json = await res.json();
+      simResult.textContent = `Peak: ${json.peakUsers} users — Recommendation: ${json.recommendation}`;
+      log(`Simulation complete: ${json.peakUsers} peak, ${json.recommendation}`);
+    }catch(e){
+      simResult.textContent = 'Simulation failed';
+      log('Simulation error: '+e.message);
     }
   });
 
-  resetBtn.addEventListener('click', ()=> clearForm());
-  confirmOk.addEventListener('click', confirmDelete);
-  confirmCancel.addEventListener('click', ()=>{ pendingDeleteId = null; closeModal(); });
-  modal.addEventListener('click', (e)=>{ if(e.target === modal) { pendingDeleteId = null; closeModal(); } });
+  deployBtn.addEventListener('click', async ()=>{
+    log('Preparing deployment preview...');
+    commandsEl.textContent = 'Fetching deployment commands...';
+    try{
+      const res = await fetch('/deploy',{method:'POST'});
+      const json = await res.json();
+      commandsEl.textContent = json.commands.join('\n');
+      log('Deployment preview fetched');
 
-  // init
-  load(); render();
-})();
+      // Simulate a staged deploy progress locally for UI
+      log('Triggering simulated deploy (safe preview only)');
+      for(let i=0;i<4;i++){
+        await new Promise(r=>setTimeout(r,500));
+        log(['Building container','Pushing image','Updating services','Verifying health'][i]);
+      }
+      log('Preview deploy complete — use your CI (Jenkins) to run actual pipeline');
+    }catch(e){
+      commandsEl.textContent = 'Failed to fetch deploy preview';
+      log('Deploy preview error: '+e.message);
+    }
+  });
+});
+
+// Floating info panel — project details and quick references
+const projectInfo = {
+  overview: `This demo illustrates an automated deployment workflow designed for high-traffic events. It includes a frontend traffic simulator, a Node.js server, Docker containerization, and a sample Jenkins pipeline for CI/CD. The UI focuses on clarity, safe deploy previews, and actionable recommendations.`,
+  commands: `# Docker build and push (example):\n
+docker build -t registry.example.com/myteam/myapp:latest .\ndocker push registry.example.com/myteam/myapp:latest\n\n# Kubernetes rollout (example):\nkubectl set image deployment/myapp myapp=registry.example.com/myteam/myapp:latest --record\n\n# Jenkins pipeline: see Jenkinsfile in repository`,
+  arch: `Architecture (example):\n- Users -> CDN -> Load Balancer -> Multiple stateless Node.js replicas behind autoscaler\n- Images stored in container registry; deployments via CI to k8s with health checks and readiness probes\n- Metrics: use Prometheus/Grafana; alerts for high latency and error rates`,
+  best: `Best practices for high-traffic deploys:\n- Use canary or blue/green deployments to reduce blast radius.\n- Enable autoscaling based on request latency and custom metrics.\n- Employ connection draining and graceful shutdowns.\n- Run load tests before the event; monitor and rollback quickly if necessary.`
+  ,
+  contents: `
+<h3>Repository contents</h3>
+<ul>
+  <li><strong>index.html</strong> — Frontend UI with traffic simulator, deployment preview, live log, and floating info panel.</li>
+  <li><strong>styles.css</strong> — Professional navy & teal theme, layout, and floating panel styling.</li>
+  <li><strong>app.js</strong> — Frontend logic: simulator calls, deploy preview fetch, log UI, and info-panel tab rendering.</li>
+  <li><strong>server.js</strong> — Minimal Express server serving static files and endpoints: <code>/simulate</code> and <code>/deploy</code>.</li>
+  <li><strong>package.json</strong> — Project metadata and scripts; includes Express dependency.</li>
+  <li><strong>Dockerfile</strong> — Containerization steps for building the production image.</li>
+  <li><strong>Jenkinsfile</strong> — Sample declarative pipeline that builds, pushes, and deploys the image (requires credentials and kubectl context).</li>
+  <li><strong>README.md</strong> — Run instructions, Docker and Jenkins guidance.</li>
+</ul>
+<p>Each file is intentionally minimal for clarity — customize env vars, registry, and CI credentials before using in production.</p>
+`
+};
+
+function $(id){return document.getElementById(id)}
+const infoToggle = $('infoToggle');
+const infoPanel = $('infoPanel');
+const infoClose = $('infoClose');
+const infoContent = $('infoContent');
+const tabs = Array.from(document.querySelectorAll('.info-tabs .tab'));
+
+function openInfo(){
+  infoPanel.setAttribute('aria-hidden','false');
+  renderTab('overview');
+}
+function closeInfo(){
+  infoPanel.setAttribute('aria-hidden','true');
+}
+
+function renderTab(name){
+  tabs.forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+  const data = projectInfo[name] || 'No data available.';
+  let html = '';
+  if(name==='commands' || name==='arch' || name==='best'){
+    html = `<pre>${escapeHtml(data)}</pre>`;
+  } else if(name==='contents'){
+    // contents holds preformatted HTML (file list)
+    html = data;
+  } else {
+    html = `<h3>${name[0].toUpperCase()+name.slice(1)}</h3><p>${escapeHtml(data)}</p>`;
+  }
+  infoContent.innerHTML = html;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+
+infoToggle.addEventListener('click', ()=>{
+  const hidden = infoPanel.getAttribute('aria-hidden') === 'false';
+  if(hidden) closeInfo(); else openInfo();
+});
+infoClose.addEventListener('click', closeInfo);
+tabs.forEach(t=>t.addEventListener('click', ()=>renderTab(t.dataset.tab)));
+
+// close panel when clicking outside
+document.addEventListener('click',(e)=>{
+  if(!infoPanel.contains(e.target) && !infoToggle.contains(e.target)){
+    closeInfo();
+  }
+});
+
